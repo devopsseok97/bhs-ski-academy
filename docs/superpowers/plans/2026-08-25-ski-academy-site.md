@@ -20,6 +20,34 @@
 - 같은 아이의 중복 배정 제약 없음 (같은 시간대 여러 반 허용, 배정마다 -1)
 - 관리자 비밀번호는 `ADMIN_PASSWORD` 환경변수, 학부모 페이지는 인증 없음
 - 쿠폰 잔액/이력은 관리자 API에서만 반환. 공개 API 응답에 포함 금지
+- UI 태스크(7~9)는 아래 "디자인 지침"을 따른다. 지침과 태스크 내 예시 코드의 Tailwind 클래스가 다르면 지침이 우선
+
+## 디자인 지침 (가독성 최우선)
+
+사용자와 확정한 방향: 장식보다 가독성. "색 띠로 시간대가 구분되는 크고 잘 읽히는 카드".
+
+**색 토큰** (`app/globals.css`의 `@theme`에 정의, Tailwind 유틸로 사용):
+
+```css
+@theme {
+  --color-snow: #f4f8fb;    /* 배경 */
+  --color-navy: #132a45;    /* 본문 텍스트/헤더 */
+  --color-am: #2e6fdb;      /* 오전 슬롯 띠/강조 */
+  --color-pm: #e8541e;      /* 오후 슬롯 띠/강조 */
+  --color-mist: #8fa6bd;    /* 보조 텍스트 */
+}
+```
+
+**규칙:**
+
+- 폰트: Pretendard 하나만 (CDN: `https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css`). 위계는 굵기·크기로만
+- 학부모 화면: 아이 이름 최소 `text-[17px]`, 선생님 이름 `text-xl font-bold`. 본문 텍스트는 navy, 보조는 mist
+- 반 카드: 흰 카드 + **상단 컬러 띠** (오전 `--color-am`, 오후 `--color-pm`, 높이 6px 정도). 절취선·노치 등 티켓 장식 금지
+- 오전/오후 구분은 항상 색+텍스트 병행 (색만으로 구분 금지)
+- 터치 영역(버튼·탭·select)은 최소 44px 높이
+- 잔액 0 이하 경고는 빨간 텍스트로만 (배지·아이콘 추가 금지)
+- 애니메이션 없음 (폴링 갱신 시 화면 덜컥임 없게 상태 교체만)
+- 배경은 전체 `--color-snow`, 카드가 흰색으로 떠 보이는 구조
 
 ---
 
@@ -1066,7 +1094,7 @@ export default function Home() {
 }
 ```
 
-`app/layout.tsx`의 metadata를 `{ title: "BHS 스키아카데미", description: "반편성표 확인" }` 으로 수정. `lang="ko"` 로 변경. create-next-app 기본 데모 스타일/에셋 제거.
+`app/layout.tsx`의 metadata를 `{ title: "BHS 스키아카데미", description: "반편성표 확인" }` 으로 수정. `lang="ko"` 로 변경. `<head>`에 Pretendard CDN 링크 추가, `body`에 `bg-snow text-navy` 적용. `app/globals.css`에 디자인 지침의 `@theme` 토큰 추가, create-next-app 기본 데모 스타일/에셋 제거. 반 카드 상단에 슬롯 컬러 띠(`h-1.5`, 오전 `bg-am`/오후 `bg-pm`) 적용.
 
 - [ ] **Step 4: 브라우저 검증**
 
