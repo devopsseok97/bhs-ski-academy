@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Teacher {
+  id      String  @id @default(cuid())
+  name    String
+  active  Boolean @default(true)
+  classes Class[]
+}
+
+model Student {
+  id           String         @id @default(cuid())
+  name         String
+  memo         String         @default("")
+  couponEvents CouponEvent[]
+  assignments  ClassStudent[]
+}
+
+model CouponEvent {
+  id        String   @id @default(cuid())
+  studentId String
+  delta     Int
+  reason    String
+  createdAt DateTime @default(now())
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Class {
+  id          String         @id @default(cuid())
+  date        String
+  slot        String
+  teacherId   String
+  teacher     Teacher        @relation(fields: [teacherId], references: [id])
+  assignments ClassStudent[]
+
+  @@index([date, slot])
+}
+
+model ClassStudent {
+  id        String  @id @default(cuid())
+  classId   String
+  studentId String
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
