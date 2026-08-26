@@ -28,7 +28,7 @@ export default function Toast({ message, tone = "info", onDismiss }: ToastProps)
         <button
           type="button"
           onClick={onDismiss}
-          className="-mr-1 -mt-1 rounded p-1 text-current opacity-80 transition-opacity hover:opacity-100"
+          className="-mr-1 -mt-1 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-current opacity-80 transition-opacity hover:opacity-100"
           aria-label="알림 닫기"
         >
           <span aria-hidden="true">×</span>
