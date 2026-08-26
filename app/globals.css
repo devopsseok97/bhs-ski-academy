@@ -1,13 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --color-snow: #f4f8fb;
-  --color-navy: #132a45;
-  --color-am: #2e6fdb;
-  --color-pm: #e8541e;
-  --color-mist: #8fa6bd;
+  --color-alpine: #102a43;
+  --color-summit: #1f5f8b;
+  --color-ice: #eaf5fb;
+  --color-sky: #4da9d9;
+  --color-slate: #60758a;
+  --color-success: #168365;
+  --color-danger: #c43d4b;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f7fbfd;
+  --color-border: #d8e5ec;
 }
 
 body {
+  background: var(--color-ice);
+  color: var(--color-alpine);
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+::selection {
+  background: var(--color-sky);
+  color: var(--color-alpine);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: 3px;
 }
