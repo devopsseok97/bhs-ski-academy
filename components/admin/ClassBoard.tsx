@@ -107,7 +107,7 @@ export default function ClassBoard() {
       {error && (
         <div className="mb-4 flex items-center justify-between rounded-lg bg-white border border-red-200 p-3 text-sm text-red-700">
           {error}
-          <button onClick={load} className="font-semibold underline text-red-700">
+          <button onClick={load} className="font-semibold underline text-red-700 py-2 px-2">
             다시 시도
           </button>
         </div>
@@ -117,7 +117,7 @@ export default function ClassBoard() {
         <select
           value={teacherId}
           onChange={(e) => setTeacherId(e.target.value)}
-          className="flex-1 rounded-lg border border-mist/40 bg-white p-3 text-navy"
+          className="flex-1 rounded-lg border border-mist/40 bg-white p-3 text-navy min-h-[44px]"
         >
           <option value="">선생님 선택</option>
           {teachers.map((t) => (
@@ -143,7 +143,7 @@ export default function ClassBoard() {
                 <p className="text-xl font-bold text-navy">{c.teacher.name} 선생님</p>
                 <button
                   onClick={() => removeClass(c.id)}
-                  className="text-sm text-red-600 font-semibold py-2 px-2"
+                  className="text-sm text-red-600 font-semibold py-3 px-3"
                 >
                   반 삭제
                 </button>
@@ -157,7 +157,7 @@ export default function ClassBoard() {
                     </span>
                     <button
                       onClick={() => unassign(a.id)}
-                      className="text-sm text-mist font-semibold py-2 px-2"
+                      className="text-sm text-mist font-semibold py-3 px-3"
                     >
                       빼기
                     </button>
