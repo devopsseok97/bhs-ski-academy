@@ -57,6 +57,7 @@ export default function ScheduleView({
   const [schedule, setSchedule] = useState<Schedule | null>(null);
 
   useEffect(() => {
+    setSchedule(null);
     let alive = true;
     const load = async () => {
       try {
