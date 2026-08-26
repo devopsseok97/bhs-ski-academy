@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ClassBoard from "./ClassBoard";
 import TeacherManager from "./TeacherManager";
 import StudentManager from "./StudentManager";
 
@@ -27,7 +28,7 @@ export default function AdminDashboard() {
           </button>
         ))}
       </div>
-      {tab === "반편성" && <p>준비 중</p>}
+      {tab === "반편성" && <ClassBoard />}
       {tab === "아이 관리" && <StudentManager />}
       {tab === "선생님 관리" && <TeacherManager />}
     </div>
