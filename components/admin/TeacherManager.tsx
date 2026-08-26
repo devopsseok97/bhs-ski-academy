@@ -13,7 +13,15 @@ export default function TeacherManager() {
     if (res.ok) setTeachers(await res.json());
   };
   useEffect(() => {
-    load();
+    let alive = true;
+    fetch("/api/admin/teachers")
+      .then(async (res) => {
+        if (res.ok && alive) setTeachers(await res.json());
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const add = async (e: React.FormEvent) => {

@@ -54,15 +54,16 @@ export default function ScheduleView({
   tomorrow: string;
 }) {
   const [date, setDate] = useState(today);
-  const [schedule, setSchedule] = useState<Schedule | null>(null);
+  const [loaded, setLoaded] = useState<{ date: string; schedule: Schedule } | null>(null);
 
   useEffect(() => {
-    setSchedule(null);
     let alive = true;
     const load = async () => {
       try {
         const res = await fetch(`/api/schedule?date=${date}`);
-        if (alive && res.ok) setSchedule(await res.json());
+        if (alive && res.ok) {
+          setLoaded({ date, schedule: await res.json() });
+        }
       } catch {
         /* 다음 폴링에서 재시도 */
       }
@@ -74,6 +75,8 @@ export default function ScheduleView({
       clearInterval(timer);
     };
   }, [date]);
+
+  const schedule = loaded?.date === date ? loaded.schedule : null;
 
   return (
     <div className="mx-auto max-w-md px-4 py-6">

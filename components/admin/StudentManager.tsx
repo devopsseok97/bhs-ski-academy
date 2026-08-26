@@ -14,7 +14,15 @@ export default function StudentManager() {
     if (res.ok) setStudents(await res.json());
   };
   useEffect(() => {
-    load();
+    let alive = true;
+    fetch("/api/admin/students")
+      .then(async (res) => {
+        if (res.ok && alive) setStudents(await res.json());
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const add = async (e: React.FormEvent) => {

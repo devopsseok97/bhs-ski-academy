@@ -35,8 +35,34 @@ export default function ClassBoard() {
   }, [date]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let alive = true;
+
+    Promise.all([
+      fetch(`/api/admin/classes?date=${date}`),
+      fetch("/api/admin/teachers"),
+      fetch("/api/admin/students"),
+    ])
+      .then(async ([c, t, s]) => {
+        if (!c.ok || !t.ok || !s.ok) throw new Error();
+        const [nextClasses, nextTeachers, nextStudents] = await Promise.all([
+          c.json(),
+          t.json(),
+          s.json(),
+        ]);
+        if (!alive) return;
+        setClasses(nextClasses);
+        setTeachers(nextTeachers);
+        setStudents(nextStudents);
+        setError("");
+      })
+      .catch(() => {
+        if (alive) setError("불러오기에 실패했습니다");
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [date]);
 
   const act = async (fn: () => Promise<Response>) => {
     try {
