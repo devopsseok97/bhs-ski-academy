@@ -219,6 +219,28 @@ describe("학부모 반편성표", () => {
     expect(container.querySelector("[role='alert']")).toBeNull();
   });
 
+  it("빈 반편성을 갱신하다 실패해도 빈 상태 안내를 유지한다", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(scheduleResponse("2026-08-26"))
+        .mockRejectedValueOnce(new TypeError("Failed to fetch")),
+    );
+
+    await renderSchedule();
+    expect(container.textContent).toContain("아직 반편성 전입니다");
+
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>("[aria-label='반편성표 새로고침']")!.click();
+    });
+
+    expect(container.querySelector("[role='alert']")?.textContent).toContain(
+      "인터넷 연결을 확인",
+    );
+    expect(container.textContent).toContain("아직 반편성 전입니다");
+  });
+
   it("학생 이름을 모바일에서도 17px 이상으로 표시한다", async () => {
     vi.stubGlobal(
       "fetch",

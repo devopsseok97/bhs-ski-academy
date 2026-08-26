@@ -227,7 +227,7 @@ export default function ScheduleView({
           />
         )}
 
-        {!view.isInitialLoading && !view.error && isEmpty && (
+        {!view.isInitialLoading && isEmpty && (
           <StatusPanel
             title="아직 반편성 전입니다"
             description={`${formatDateForStatus(view.selectedDate)} 수업 반편성이 완료되면 이곳에 안내해드립니다.`}
