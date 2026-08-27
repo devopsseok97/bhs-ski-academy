@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Worktrees under .worktrees/ have their own lint runs.
+    ".worktrees/**",
   ]),
 ]);
 
