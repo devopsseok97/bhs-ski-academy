@@ -91,6 +91,8 @@ export default function ClassBoard() {
   const amClasses = board.classes.filter((c) => c.slot === "AM");
   const pmClasses = board.classes.filter((c) => c.slot === "PM");
   const activeSlotClasses = selectedSlot === "AM" ? amClasses : pmClasses;
+  const amStudentCount = amClasses.reduce((sum, c) => sum + c.assignments.length, 0);
+  const pmStudentCount = pmClasses.reduce((sum, c) => sum + c.assignments.length, 0);
 
   const editTarget = board.classes.find((c) => c.id === editTargetId) ?? null;
   const deleteTarget = board.classes.find((c) => c.id === deleteTargetId) ?? null;
@@ -231,12 +233,41 @@ export default function ClassBoard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-3">
-        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-alpine">반편성</h1>
-        <p className="text-sm text-slate">
+      <header className="flex items-end justify-between gap-4 border-b border-border pb-4">
+        <h1 className="text-[32px] font-black leading-none tracking-[-0.03em] text-alpine sm:text-[36px]">
+          반편성
+        </h1>
+        <p className="hidden max-w-xs text-right text-sm leading-5 text-slate sm:block">
           날짜를 선택해 오전·오후 반을 만들고 학생을 배정하세요.
         </p>
       </header>
+
+      <section
+        aria-label="반편성 요약"
+        className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border bg-border"
+      >
+        <div className="bg-surface px-4 py-4 sm:px-5">
+          <p className="text-[11px] font-bold tracking-[0.14em] text-sky">오전</p>
+          <p className="mt-1 flex items-baseline gap-1 text-alpine">
+            <span className="text-3xl font-black tabular-nums">{amClasses.length}</span>
+            <span className="text-sm font-bold text-slate">반 · {amStudentCount}명</span>
+          </p>
+        </div>
+        <div className="bg-surface px-4 py-4 sm:px-5">
+          <p className="text-[11px] font-bold tracking-[0.14em] text-sunset">오후</p>
+          <p className="mt-1 flex items-baseline gap-1 text-alpine">
+            <span className="text-3xl font-black tabular-nums">{pmClasses.length}</span>
+            <span className="text-sm font-bold text-slate">반 · {pmStudentCount}명</span>
+          </p>
+        </div>
+        <div className="bg-surface px-4 py-4 sm:px-5">
+          <p className="text-[11px] font-bold tracking-[0.14em] text-slate">선생님</p>
+          <p className="mt-1 flex items-baseline gap-1 text-alpine">
+            <span className="text-3xl font-black tabular-nums">{board.teachers.length}</span>
+            <span className="text-sm font-bold text-slate">명 등록</span>
+          </p>
+        </div>
+      </section>
 
       <section
         aria-label="반편성 필터"
@@ -268,11 +299,11 @@ export default function ClassBoard() {
                     active
                       ? isAm
                         ? "border-sky bg-sky/10 text-summit"
-                        : "border-summit bg-summit/10 text-summit"
+                        : "border-sunset bg-sunset/10 text-sunset"
                       : "border-border bg-surface text-slate"
                   }`}
                 >
-                  {isAm ? `오전 (${amClasses.length})` : `오후 (${pmClasses.length})`}
+                  {isAm ? `오전 · ${amClasses.length}반` : `오후 · ${pmClasses.length}반`}
                 </button>
               );
             })}
@@ -329,17 +360,18 @@ export default function ClassBoard() {
           <div className="md:hidden">{renderClasses(activeSlotClasses, selectedSlot)}</div>
           <div className="hidden gap-6 md:grid md:grid-cols-2">
             <section aria-labelledby="admin-am" className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="block h-6 w-1.5 rounded-full bg-sky" />
-                  <h2 id="admin-am" className="text-lg font-extrabold text-alpine">
-                    오전 ({amClasses.length})
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-baseline gap-2">
+                  <h2 id="admin-am" className="text-2xl font-black tracking-[-0.03em] text-sky">
+                    오전
                   </h2>
+                  <span className="text-sm font-bold text-slate">{amClasses.length}개 반</span>
                 </div>
+                <span aria-hidden="true" className="h-[3px] flex-1 rounded-full bg-sky/70" />
                 <button
                   type="button"
                   onClick={() => openCreateForSlot("AM")}
-                  className="inline-flex min-h-[40px] items-center rounded-lg border border-border bg-surface px-3 py-1 text-xs font-bold text-alpine hover:bg-ice"
+                  className="inline-flex min-h-[40px] shrink-0 items-center rounded-lg border border-sky/40 bg-surface px-3 py-1 text-xs font-bold text-summit hover:bg-sky/10"
                 >
                   + 오전 반
                 </button>
@@ -347,17 +379,18 @@ export default function ClassBoard() {
               {renderClasses(amClasses, "AM")}
             </section>
             <section aria-labelledby="admin-pm" className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="block h-6 w-1.5 rounded-full bg-summit" />
-                  <h2 id="admin-pm" className="text-lg font-extrabold text-alpine">
-                    오후 ({pmClasses.length})
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-baseline gap-2">
+                  <h2 id="admin-pm" className="text-2xl font-black tracking-[-0.03em] text-sunset">
+                    오후
                   </h2>
+                  <span className="text-sm font-bold text-slate">{pmClasses.length}개 반</span>
                 </div>
+                <span aria-hidden="true" className="h-[3px] flex-1 rounded-full bg-sunset/70" />
                 <button
                   type="button"
                   onClick={() => openCreateForSlot("PM")}
-                  className="inline-flex min-h-[40px] items-center rounded-lg border border-border bg-surface px-3 py-1 text-xs font-bold text-alpine hover:bg-ice"
+                  className="inline-flex min-h-[40px] shrink-0 items-center rounded-lg border border-sunset/40 bg-surface px-3 py-1 text-xs font-bold text-sunset hover:bg-sunset-soft"
                 >
                   + 오후 반
                 </button>

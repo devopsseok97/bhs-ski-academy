@@ -48,3 +48,25 @@ model ClassStudent {
   class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
   student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
+
+model CalendarEvent {
+  id        String   @id @default(cuid())
+  date      String
+  label     String
+  tone      String   @default("competition")
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  pinned    Boolean  @default(false)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, pinned, createdAt])
+}

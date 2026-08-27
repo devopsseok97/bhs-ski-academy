@@ -116,14 +116,50 @@ export default function StudentManager() {
     }
   };
 
+  const lowBalanceCount = students.filter((s) => s.balance <= 0).length;
+
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-3">
-        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-alpine">아이·쿠폰</h1>
-        <p className="text-sm text-slate">
-          학생을 등록하고 쿠폰을 관리하세요. 배정과 취소는 반편성 화면에서 처리합니다.
+      <header className="flex items-end justify-between gap-4 border-b border-border pb-4">
+        <h1 className="text-[32px] font-black leading-none tracking-[-0.03em] text-alpine sm:text-[36px]">
+          아이 · 쿠폰
+        </h1>
+        <p className="hidden max-w-xs text-right text-sm leading-5 text-slate sm:block">
+          학생 등록·쿠폰 관리. 배정은 반편성에서.
         </p>
       </header>
+
+      <section
+        aria-label="학생 요약"
+        className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border"
+      >
+        <div className="bg-surface px-4 py-4 sm:px-5">
+          <p className="text-[11px] font-bold tracking-[0.14em] text-slate">등록 학생</p>
+          <p className="mt-1 flex items-baseline gap-1 text-alpine">
+            <span className="text-3xl font-black tabular-nums">{students.length}</span>
+            <span className="text-sm font-bold text-slate">명</span>
+          </p>
+        </div>
+        <div className={`px-4 py-4 sm:px-5 ${lowBalanceCount > 0 ? "bg-danger/8" : "bg-surface"}`}>
+          <p
+            className={`text-[11px] font-bold tracking-[0.14em] ${
+              lowBalanceCount > 0 ? "text-danger" : "text-slate"
+            }`}
+          >
+            쿠폰 부족
+          </p>
+          <p className="mt-1 flex items-baseline gap-1">
+            <span
+              className={`text-3xl font-black tabular-nums ${
+                lowBalanceCount > 0 ? "text-danger" : "text-alpine"
+              }`}
+            >
+              {lowBalanceCount}
+            </span>
+            <span className="text-sm font-bold text-slate">명 · 충전 필요</span>
+          </p>
+        </div>
+      </section>
 
       <StudentForm isSubmitting={isRegistering} onSubmit={handleRegister} />
 
@@ -206,12 +242,20 @@ export default function StudentManager() {
             return (
               <li
                 key={student.id}
-                className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3"
+                className={`grid grid-cols-[6px_minmax(0,2fr)_minmax(0,3fr)_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-xl border pl-0 pr-4 py-3 ${
+                  lowBalance
+                    ? "border-danger/30 bg-danger/5"
+                    : "border-border bg-surface"
+                }`}
               >
-                <p className="text-[17px] font-bold text-alpine">{student.name}</p>
+                <span
+                  aria-hidden="true"
+                  className={`h-full w-1.5 ${lowBalance ? "bg-danger" : "bg-transparent"}`}
+                />
+                <p className="text-[18px] font-bold text-alpine">{student.name}</p>
                 <p className="truncate text-sm text-slate">{student.memo || "—"}</p>
                 <p
-                  className={`text-right text-base font-bold ${
+                  className={`text-right text-base font-black tabular-nums ${
                     lowBalance ? "text-danger" : "text-summit"
                   }`}
                 >
@@ -221,7 +265,11 @@ export default function StudentManager() {
                   <button
                     type="button"
                     onClick={() => setChargeTargetId(student.id)}
-                    className="inline-flex min-h-[44px] items-center rounded-lg border border-border bg-surface px-3 py-1 text-sm font-bold text-alpine hover:bg-ice"
+                    className={`inline-flex min-h-[44px] items-center rounded-lg border px-3 py-1 text-sm font-bold hover:bg-ice ${
+                      lowBalance
+                        ? "border-danger/40 bg-surface text-danger"
+                        : "border-border bg-surface text-alpine"
+                    }`}
                   >
                     쿠폰 조정
                   </button>
@@ -246,18 +294,27 @@ export default function StudentManager() {
             return (
               <li
                 key={student.id}
-                className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4"
+                className={`flex overflow-hidden rounded-2xl border ${
+                  lowBalance
+                    ? "border-danger/30 bg-danger/5"
+                    : "border-border bg-surface"
+                }`}
               >
+                <span
+                  aria-hidden="true"
+                  className={`w-1.5 shrink-0 ${lowBalance ? "bg-danger" : "bg-transparent"}`}
+                />
+                <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[17px] font-bold leading-6 text-alpine">{student.name}</p>
+                    <p className="text-[18px] font-bold leading-6 text-alpine">{student.name}</p>
                     {student.memo && (
                       <p className="mt-1 truncate text-sm text-slate">{student.memo}</p>
                     )}
                   </div>
                   <span
-                    className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${
-                      lowBalance ? "bg-danger/10 text-danger" : "bg-surface-muted text-summit"
+                    className={`shrink-0 rounded-full px-3 py-1 text-sm font-black tabular-nums ${
+                      lowBalance ? "bg-danger text-white" : "bg-surface-muted text-summit"
                     }`}
                   >
                     {lowBalance ? `${student.balance}회 · 부족` : `${student.balance}회`}
@@ -278,6 +335,7 @@ export default function StudentManager() {
                   >
                     이력 보기
                   </button>
+                </div>
                 </div>
               </li>
             );

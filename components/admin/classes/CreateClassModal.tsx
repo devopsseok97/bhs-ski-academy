@@ -63,7 +63,7 @@ export default function CreateClassModal({
                     active
                       ? isAm
                         ? "border-sky bg-sky/10 text-summit"
-                        : "border-summit bg-summit/10 text-summit"
+                        : "border-sunset bg-sunset/10 text-sunset"
                       : "border-border bg-surface text-slate hover:bg-ice"
                   }`}
                 >

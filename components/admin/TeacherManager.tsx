@@ -90,10 +90,17 @@ export default function TeacherManager() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-3">
-        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-alpine">선생님</h1>
-        <p className="text-sm text-slate">
-          강습을 진행할 선생님을 등록하고 관리하세요. 제외해도 기존 반편성 기록은 그대로 남습니다.
+      <header className="flex items-end justify-between gap-4 border-b border-border pb-4">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-[32px] font-black leading-none tracking-[-0.03em] text-alpine sm:text-[36px]">
+            선생님
+          </h1>
+          {loaded && (
+            <span className="text-sm font-bold text-slate">{teachers.length}명 등록</span>
+          )}
+        </div>
+        <p className="hidden max-w-xs text-right text-sm leading-5 text-slate sm:block">
+          제외해도 기존 반편성 기록은 그대로 유지됩니다.
         </p>
       </header>
 

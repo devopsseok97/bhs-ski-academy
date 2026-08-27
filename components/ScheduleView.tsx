@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ScheduleClass } from "@/components/schedule/ClassCard";
+import type { CalendarEvent } from "@/components/schedule/MiniCalendar";
+import type { Notice } from "@/components/schedule/NoticeBoard";
 import ScheduleHeader from "@/components/schedule/ScheduleHeader";
 import ScheduleSection from "@/components/schedule/ScheduleSection";
 import Spinner from "@/components/ui/Spinner";
@@ -60,6 +62,34 @@ export default function ScheduleView({
     error: null,
     updatedAt: null,
   });
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    requestJson<CalendarEvent[]>("/api/events", { signal: controller.signal })
+      .then((next) => {
+        if (controller.signal.aborted) return;
+        setEvents(next);
+      })
+      .catch(() => {
+        // 이벤트 로딩 실패는 조용히 무시 — 반편성표 자체는 계속 보여야 함.
+      });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    requestJson<Notice[]>("/api/notices", { signal: controller.signal })
+      .then((next) => {
+        if (controller.signal.aborted) return;
+        setNotices(next);
+      })
+      .catch(() => {
+        // 공지 로딩 실패도 조용히 무시.
+      });
+    return () => controller.abort();
+  }, []);
   const activeRequest = useRef<{ id: number; date: string; controller: AbortController } | null>(
     null,
   );
@@ -154,6 +184,11 @@ export default function ScheduleView({
 
   const displayedData = view.data?.date === view.selectedDate ? view.data.schedule : null;
   const isEmpty = displayedData !== null && displayedData.am.length + displayedData.pm.length === 0;
+  const amCount = displayedData?.am.length ?? 0;
+  const pmCount = displayedData?.pm.length ?? 0;
+  const studentCount =
+    (displayedData?.am.reduce((sum, c) => sum + c.students.length, 0) ?? 0) +
+    (displayedData?.pm.reduce((sum, c) => sum + c.students.length, 0) ?? 0);
   const refresh = () => void loadSchedule(view.selectedDate);
 
   return (
@@ -164,6 +199,11 @@ export default function ScheduleView({
         selectedDate={view.selectedDate}
         updatedAt={view.updatedAt}
         isLoading={view.isInitialLoading || view.isRefreshing}
+        amCount={amCount}
+        pmCount={pmCount}
+        studentCount={studentCount}
+        events={events}
+        notices={notices}
         onSelectDate={selectDate}
         onRefresh={refresh}
       />

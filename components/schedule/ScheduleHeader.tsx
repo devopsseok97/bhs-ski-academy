@@ -1,4 +1,6 @@
 import BrandLogo from "@/components/brand/BrandLogo";
+import MiniCalendar, { type CalendarEvent } from "@/components/schedule/MiniCalendar";
+import NoticeBoard, { type Notice } from "@/components/schedule/NoticeBoard";
 import Spinner from "@/components/ui/Spinner";
 
 type ScheduleHeaderProps = {
@@ -7,6 +9,11 @@ type ScheduleHeaderProps = {
   selectedDate: string;
   updatedAt: Date | null;
   isLoading: boolean;
+  amCount: number;
+  pmCount: number;
+  studentCount: number;
+  events?: CalendarEvent[];
+  notices: Notice[];
   onSelectDate: (date: string) => void;
   onRefresh: () => void;
 };
@@ -32,7 +39,7 @@ function formatShortDate(date: string) {
 function formatUpdatedAt(date: Date | null) {
   if (!date) return "처음 갱신 대기 중";
 
-  return `마지막 갱신 ${new Intl.DateTimeFormat("ko-KR", {
+  return `갱신 ${new Intl.DateTimeFormat("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -46,6 +53,11 @@ export default function ScheduleHeader({
   selectedDate,
   updatedAt,
   isLoading,
+  amCount,
+  pmCount,
+  studentCount,
+  events,
+  notices,
   onSelectDate,
   onRefresh,
 }: ScheduleHeaderProps) {
@@ -53,42 +65,69 @@ export default function ScheduleHeader({
     { label: "오늘", date: today },
     { label: "내일", date: tomorrow },
   ];
+  const hasSchedule = amCount + pmCount > 0;
 
   return (
     <>
       <header className="relative isolate overflow-hidden bg-alpine text-white">
-        <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_82%_12%,rgba(77,169,217,0.25),transparent_34%),linear-gradient(135deg,#102a43_0%,#143957_58%,#1f5f8b_130%)]" />
-        <svg
+        <div className="absolute inset-0 -z-20 bg-[linear-gradient(140deg,#081a2c_0%,#102a43_55%,#143957_100%)]" />
+        <img
+          src="/brand/bhs-ski-academy-logo.png"
+          alt=""
           aria-hidden="true"
-          viewBox="0 0 1440 250"
-          preserveAspectRatio="none"
-          className="absolute inset-x-0 bottom-0 -z-10 h-28 w-full text-white/[0.07] sm:h-40"
-        >
-          <path
-            d="M0 250V190l145-72 110 47 165-123 147 116 92-52 142 96 141-159 120 113 99-49 199 108v35H0Z"
-            fill="currentColor"
-          />
-          <path
-            d="m0 212 145-72 110 47L420 64l147 116 92-52 142 96L942 65l120 113 99-49 199 108"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-          />
-        </svg>
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[460px] w-[460px] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.05] [filter:brightness(0)_invert(1)] sm:h-[600px] sm:w-[600px]"
+        />
 
-        <div className="mx-auto max-w-6xl px-4 pb-10 pt-5 sm:px-6 sm:pb-14 sm:pt-7 lg:px-8">
-          <BrandLogo compact inverse priority />
-          <div className="mt-9 max-w-xl sm:mt-12">
-            <p className="text-sm font-bold tracking-[0.16em] text-sky">수업 반편성 안내</p>
-            <h1 className="mt-2 text-[34px] font-black leading-[1.15] tracking-[-0.045em] text-white sm:text-5xl">
-              설원에서 만날
-              <br />
-              선생님과 친구들
-            </h1>
-            <p className="mt-4 text-sm leading-6 text-white/70 sm:text-base">
-              선택한 날짜의 오전·오후 반편성을 확인하세요.
-            </p>
+        <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 sm:px-6 sm:pb-10 sm:pt-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <BrandLogo compact inverse priority />
+            <span className="hidden text-[11px] font-bold tracking-[0.16em] text-sky sm:block">
+              반편성 안내
+            </span>
           </div>
+
+          <div className="mt-6 grid items-start gap-5 sm:mt-8 sm:gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)_minmax(0,340px)]">
+            <div className="w-full lg:justify-self-start">
+              <MiniCalendar
+                today={today}
+                selectedDate={selectedDate}
+                events={events}
+                onSelectDate={onSelectDate}
+              />
+            </div>
+
+            <NoticeBoard notices={notices} placement="header" />
+
+            <dl className="grid w-full grid-cols-3 gap-px overflow-hidden rounded-2xl bg-white/10 text-center lg:justify-self-end">
+              <div className="flex flex-col justify-center bg-white/[0.04] px-4 py-5 sm:px-5">
+                <dt className="text-[11px] font-bold tracking-[0.12em] text-sky">오전</dt>
+                <dd className="mt-1.5 text-3xl font-black tabular-nums text-white sm:text-4xl">
+                  {amCount}
+                  <span className="ml-1 text-sm font-bold text-white/60">반</span>
+                </dd>
+              </div>
+              <div className="flex flex-col justify-center bg-white/[0.04] px-4 py-5 sm:px-5">
+                <dt className="text-[11px] font-bold tracking-[0.12em] text-sunset">오후</dt>
+                <dd className="mt-1.5 text-3xl font-black tabular-nums text-white sm:text-4xl">
+                  {pmCount}
+                  <span className="ml-1 text-sm font-bold text-white/60">반</span>
+                </dd>
+              </div>
+              <div className="flex flex-col justify-center bg-white/[0.04] px-4 py-5 sm:px-5">
+                <dt className="text-[11px] font-bold tracking-[0.12em] text-white/70">학생</dt>
+                <dd className="mt-1.5 text-3xl font-black tabular-nums text-white sm:text-4xl">
+                  {studentCount}
+                  <span className="ml-1 text-sm font-bold text-white/60">명</span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          {!hasSchedule && (
+            <p className="mt-5 text-sm text-white/60">
+              선택한 날짜의 반편성이 아직 등록되지 않았습니다.
+            </p>
+          )}
         </div>
       </header>
 
@@ -99,7 +138,7 @@ export default function ScheduleHeader({
         <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.12em] text-slate">선택한 수업 날짜</p>
+              <p className="text-[11px] font-bold tracking-[0.12em] text-slate">보고 있는 날짜</p>
               <p className="mt-0.5 truncate text-base font-extrabold tracking-[-0.02em] text-alpine sm:text-lg">
                 {formatScheduleDate(selectedDate)}
               </p>

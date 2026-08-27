@@ -8,28 +8,22 @@ type ScheduleSectionProps = {
 
 export default function ScheduleSection({ title, slot, classes }: ScheduleSectionProps) {
   const isMorning = slot === "AM";
+  const accent = isMorning ? "text-sky" : "text-sunset";
+  const rule = isMorning ? "bg-sky" : "bg-sunset";
 
   return (
     <section aria-labelledby={`schedule-${slot.toLowerCase()}`}>
-      <div className="mb-4 flex items-end justify-between gap-4 px-1">
-        <div className="flex items-center gap-3">
-          <span
-            aria-hidden="true"
-            className={`h-9 w-1.5 rounded-full ${isMorning ? "bg-sky" : "bg-summit"}`}
-          />
-          <div>
-            <p className="text-xs font-bold tracking-[0.14em] text-slate">
-              {isMorning ? "하루의 첫 수업" : "하루의 두 번째 수업"}
-            </p>
-            <h2
-              id={`schedule-${slot.toLowerCase()}`}
-              className="mt-0.5 text-2xl font-extrabold tracking-[-0.03em] text-alpine"
-            >
-              {title} 반편성
-            </h2>
-          </div>
+      <div className="mb-4 flex items-center justify-between gap-4 px-1">
+        <div className="flex items-baseline gap-3">
+          <h2
+            id={`schedule-${slot.toLowerCase()}`}
+            className={`text-3xl font-black tracking-[-0.04em] ${accent}`}
+          >
+            {title}
+          </h2>
+          <span className="text-sm font-bold text-slate">{classes.length}개 반</span>
         </div>
-        <span className="shrink-0 text-sm font-semibold text-slate">총 {classes.length}개 반</span>
+        <span aria-hidden="true" className={`h-1 flex-1 max-w-[60%] rounded-full ${rule}`} />
       </div>
 
       {classes.length === 0 ? (
