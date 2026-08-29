@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Modal from "@/components/ui/Modal";
 import Spinner from "@/components/ui/Spinner";
 import StatusPanel from "@/components/ui/StatusPanel";
 import Toast from "@/components/ui/Toast";
@@ -41,6 +42,9 @@ export default function StudentManager() {
 
   const [historyTargetId, setHistoryTargetId] = useState<string | null>(null);
 
+  const [removeTargetId, setRemoveTargetId] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
+
   const requestReload = () => setReloadKey((key) => key + 1);
 
   useEffect(() => {
@@ -76,6 +80,7 @@ export default function StudentManager() {
 
   const chargeTarget = students.find((s) => s.id === chargeTargetId) ?? null;
   const historyTarget = students.find((s) => s.id === historyTargetId) ?? null;
+  const removeTarget = students.find((s) => s.id === removeTargetId) ?? null;
 
   const handleRegister = async ({ name, memo }: { name: string; memo: string }) => {
     setIsRegistering(true);
@@ -86,11 +91,30 @@ export default function StudentManager() {
         body: JSON.stringify({ name, memo }),
       });
       requestReload();
-      setFeedback({ tone: "success", text: `${name} 학생을 등록했습니다.` });
+      setFeedback({ tone: "success", text: `${name} 수강생을 등록했습니다.` });
     } catch (error) {
       setFeedback({ tone: "error", text: errorText(error) });
     } finally {
       setIsRegistering(false);
+    }
+  };
+
+  const confirmRemove = async () => {
+    if (!removeTargetId) return;
+    const targetName = removeTarget?.name ?? "";
+    setIsRemoving(true);
+    try {
+      await requestJson(`/api/admin/students/${removeTargetId}`, { method: "DELETE" });
+      requestReload();
+      setRemoveTargetId(null);
+      setFeedback({
+        tone: "success",
+        text: `${targetName || "수강생"}을(를) 삭제했습니다.`,
+      });
+    } catch (error) {
+      setFeedback({ tone: "error", text: errorText(error) });
+    } finally {
+      setIsRemoving(false);
     }
   };
 
@@ -122,10 +146,10 @@ export default function StudentManager() {
     <div className="flex flex-col gap-6">
       <header className="flex items-end justify-between gap-4 border-b border-border pb-4">
         <h1 className="text-[32px] font-black leading-none tracking-[-0.03em] text-alpine sm:text-[36px]">
-          아이 · 쿠폰
+          수강생 · 쿠폰
         </h1>
         <p className="hidden max-w-xs text-right text-sm leading-5 text-slate sm:block">
-          학생 등록·쿠폰 관리. 배정은 반편성에서.
+          수강생 등록·쿠폰 관리. 배정은 반편성에서.
         </p>
       </header>
 
@@ -134,7 +158,7 @@ export default function StudentManager() {
         className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border"
       >
         <div className="bg-surface px-4 py-4 sm:px-5">
-          <p className="text-[11px] font-bold tracking-[0.14em] text-slate">등록 학생</p>
+          <p className="text-[11px] font-bold tracking-[0.14em] text-slate">등록 수강생</p>
           <p className="mt-1 flex items-baseline gap-1 text-alpine">
             <span className="text-3xl font-black tabular-nums">{students.length}</span>
             <span className="text-sm font-bold text-slate">명</span>
@@ -280,6 +304,13 @@ export default function StudentManager() {
                   >
                     이력
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setRemoveTargetId(student.id)}
+                    className="inline-flex min-h-[44px] items-center rounded-lg border border-danger/40 bg-surface px-3 py-1 text-sm font-bold text-danger hover:bg-danger/10"
+                  >
+                    삭제
+                  </button>
                 </div>
               </li>
             );
@@ -320,7 +351,7 @@ export default function StudentManager() {
                     {lowBalance ? `${student.balance}회 · 부족` : `${student.balance}회`}
                   </span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => setChargeTargetId(student.id)}
@@ -334,6 +365,13 @@ export default function StudentManager() {
                     className="inline-flex flex-1 min-h-[44px] items-center justify-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-bold text-alpine hover:bg-ice"
                   >
                     이력 보기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRemoveTargetId(student.id)}
+                    className="inline-flex basis-full min-h-[44px] items-center justify-center rounded-lg border border-danger/40 bg-surface px-3 py-2 text-sm font-bold text-danger hover:bg-danger/10"
+                  >
+                    수강생 삭제
                   </button>
                 </div>
                 </div>
@@ -360,6 +398,46 @@ export default function StudentManager() {
         studentName={historyTarget?.name ?? ""}
         onClose={() => setHistoryTargetId(null)}
       />
+
+      <Modal
+        open={removeTarget !== null}
+        title="수강생 삭제 확인"
+        onClose={() => {
+          if (!isRemoving) setRemoveTargetId(null);
+        }}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-[15px] leading-6 text-alpine">
+            {removeTarget && (
+              <>
+                <span className="font-bold">{removeTarget.name}</span> 수강생을 완전히 삭제할까요?
+              </>
+            )}
+          </p>
+          <p className="rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm leading-5 text-slate">
+            쿠폰 이력과 반 배정 기록이 함께 삭제되며 되돌릴 수 없습니다.
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setRemoveTargetId(null)}
+              disabled={isRemoving}
+              className="inline-flex min-h-[48px] items-center rounded-xl border border-border bg-surface px-4 py-2 text-sm font-bold text-alpine hover:bg-ice disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={confirmRemove}
+              disabled={isRemoving}
+              className="inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-danger px-5 py-2 text-sm font-bold text-white hover:bg-danger/90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isRemoving && <Spinner size="sm" label="삭제 중" />}
+              <span>{isRemoving ? "삭제 중" : "수강생 삭제"}</span>
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

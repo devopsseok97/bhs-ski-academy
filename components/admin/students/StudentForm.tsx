@@ -26,14 +26,14 @@ export default function StudentForm({ isSubmitting, onSubmit }: StudentFormProps
       onSubmit={submit}
       className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 sm:p-5"
     >
-      <h2 className="text-lg font-bold text-alpine">아이 등록</h2>
+      <h2 className="text-lg font-bold text-alpine">수강생 등록</h2>
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto]">
         <label className="flex flex-col gap-1 text-sm font-semibold text-alpine">
           이름
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="아이 이름"
+            placeholder="수강생 이름"
             disabled={isSubmitting}
             className="min-h-[48px] rounded-xl border border-border bg-surface px-4 py-2 text-base text-alpine placeholder:text-slate disabled:bg-ice"
           />

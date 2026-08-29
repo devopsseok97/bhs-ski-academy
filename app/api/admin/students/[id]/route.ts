@@ -16,3 +16,14 @@ export async function PATCH(
   const student = await prisma.student.update({ where: { id }, data });
   return NextResponse.json(student);
 }
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  const { id } = await params;
+  await prisma.student.delete({ where: { id } });
+  return NextResponse.json({ ok: true });
+}

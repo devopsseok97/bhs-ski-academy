@@ -18,9 +18,9 @@ const ITEMS: readonly NavItem[] = [
   },
   {
     id: "students",
-    label: "아이 · 쿠폰",
-    short: "아이",
-    description: "학생 등록과 쿠폰 관리",
+    label: "수강생 · 쿠폰",
+    short: "수강생",
+    description: "수강생 등록과 쿠폰 관리",
   },
   {
     id: "teachers",
